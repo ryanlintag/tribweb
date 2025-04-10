@@ -8,6 +8,15 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 builder.Services.AddSyncfusionBlazor();
 
+// Enforce HTTPS by configuring Kestrel
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ListenAnyIP(5001, listenOptions =>
+    {
+        listenOptions.UseHttps(); // Enforce HTTPS
+    });
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
