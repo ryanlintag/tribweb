@@ -3,11 +3,18 @@ using Syncfusion.Blazor;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add environment variables to configuration
-builder.Configuration.AddEnvironmentVariables();
+// Retrieve configuration values and log them
+var clientSecret = builder.Configuration["AzureAd:AZURE_AD_CLIENT_SECRET"];
+var clientId = builder.Configuration["AzureAd:AZURE_AD_CLIENT_ID"];
+var tenantId = builder.Configuration["AzureAd:AZURE_AD_TENANT_ID"];
 
-builder.Configuration.AddJsonFile("./TribWebApp/appsettings.json", optional: false, reloadOnChange: true);
+var azureAd = new AzureAd();
+builder.Configuration.GetSection(AzureAd.SectionName).Bind(azureAd);
+azureAd.ClientId = clientId;
+azureAd.ClientSecret = clientSecret;
+azureAd.TenantId = tenantId;
 
+builder.Services.AddSingleton(azureAd);
 
 // // Add services
 // builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
@@ -26,14 +33,6 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 builder.Services.AddSyncfusionBlazor();
 
-// Retrieve configuration values and log them
-var clientSecret = builder.Configuration["AzureAd:ClientSecret"];
-var clientId = builder.Configuration["AzureAd:ClientId"];
-var tenantId = builder.Configuration["AzureAd:TenantId"];
-
-Console.WriteLine($"Client Secret: {clientSecret}");
-Console.WriteLine($"Client ID: {clientId}");
-Console.WriteLine($"Tenant ID: {tenantId}");
 
 var app = builder.Build();
 
@@ -58,7 +57,7 @@ app.MapRazorComponents<App>()
 
 
 // API Endpoints
-app.MapGet("/api/secure-data", () => "Protected data!");
+app.MapGet("/api/secure-data", (AzureAd azure) => azure.ClientId);
     // .RequireAuthorization("ApiAccess");
 
 
