@@ -3,11 +3,17 @@ using Syncfusion.Blazor;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services
-builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
-    .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAd"))
-    .EnableTokenAcquisitionToCallDownstreamApi()
-    .AddInMemoryTokenCaches();
+// Add environment variables to configuration
+builder.Configuration.AddEnvironmentVariables();
+
+builder.Configuration.AddJsonFile("./TribWebApp/appsettings.json", optional: false, reloadOnChange: true);
+
+
+// // Add services
+// builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
+//     .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAd"))
+//     .EnableTokenAcquisitionToCallDownstreamApi()
+//     .AddInMemoryTokenCaches();
 
 // builder.Services.AddAuthorization(options =>
 // {
@@ -20,14 +26,14 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 builder.Services.AddSyncfusionBlazor();
 
-// Enforce HTTPS by configuring Kestrel
-builder.WebHost.ConfigureKestrel(options =>
-{
-    options.ListenAnyIP(5001, listenOptions =>
-    {
-        listenOptions.UseHttps(); // Enforce HTTPS
-    });
-});
+// Retrieve configuration values and log them
+var clientSecret = builder.Configuration["AzureAd:ClientSecret"];
+var clientId = builder.Configuration["AzureAd:ClientId"];
+var tenantId = builder.Configuration["AzureAd:TenantId"];
+
+Console.WriteLine($"Client Secret: {clientSecret}");
+Console.WriteLine($"Client ID: {clientId}");
+Console.WriteLine($"Tenant ID: {tenantId}");
 
 var app = builder.Build();
 
