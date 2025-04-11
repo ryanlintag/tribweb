@@ -1,10 +1,28 @@
 using TribWebApp.Components;
+using Syncfusion.Blazor;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.Identity.Web;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Add services
+builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
+    .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAd"))
+    .EnableTokenAcquisitionToCallDownstreamApi()
+    .AddInMemoryTokenCaches();
+
+// builder.Services.AddAuthorization(options =>
+// {
+//     options.AddPolicy("ApiAccess", policy =>
+//         policy.RequireClaim("scope", "access_as_user"));
+// });
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+builder.Services.AddSyncfusionBlazor();
+
+builder.Services.AddHttpClient();
 
 var app = builder.Build();
 
@@ -18,11 +36,19 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseRouting();
+// app.UseAuthentication();
+// app.UseAuthorization();
 
 app.UseAntiforgery();
-
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
+
+
+// API Endpoints
+app.MapGet("/api/secure-data", () => "Protected data!");
+    // .RequireAuthorization("ApiAccess");
+
 
 app.Run();

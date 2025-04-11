@@ -1,0 +1,28 @@
+@inject HttpClient Http
+
+<h3>Secure Data</h3>
+
+@if (secureData == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <h2>@secureData</h2>
+}
+
+@code {
+    private string? secureData;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            secureData = await Http.GetStringAsync("https://localhost:5001/api/secure-data");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error fetching secure data: {ex.Message}");
+        }
+    }
+}
