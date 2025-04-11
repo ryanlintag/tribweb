@@ -1,7 +1,5 @@
 using TribWebApp.Components;
 using Syncfusion.Blazor;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Microsoft.Identity.Web;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,7 +20,14 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 builder.Services.AddSyncfusionBlazor();
 
-builder.Services.AddHttpClient();
+// Enforce HTTPS by configuring Kestrel
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ListenAnyIP(5001, listenOptions =>
+    {
+        listenOptions.UseHttps(); // Enforce HTTPS
+    });
+});
 
 var app = builder.Build();
 
