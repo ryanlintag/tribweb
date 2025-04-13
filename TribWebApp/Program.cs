@@ -3,11 +3,24 @@ using Syncfusion.Blazor;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services
-builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
-    .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAd"))
-    .EnableTokenAcquisitionToCallDownstreamApi()
-    .AddInMemoryTokenCaches();
+// Retrieve configuration values and log them
+var clientSecret = builder.Configuration["AzureAd:AZURE_AD_CLIENT_SECRET"];
+var clientId = builder.Configuration["AzureAd:AZURE_AD_CLIENT_ID"];
+var tenantId = builder.Configuration["AzureAd:AZURE_AD_TENANT_ID"];
+
+var azureAd = new AzureAd();
+builder.Configuration.GetSection(AzureAd.SectionName).Bind(azureAd);
+azureAd.ClientId = clientId;
+azureAd.ClientSecret = clientSecret;
+azureAd.TenantId = tenantId;
+
+builder.Services.AddSingleton(azureAd);
+
+// // Add services
+// builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
+//     .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAd"))
+//     .EnableTokenAcquisitionToCallDownstreamApi()
+//     .AddInMemoryTokenCaches();
 
 // builder.Services.AddAuthorization(options =>
 // {
@@ -20,14 +33,11 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 builder.Services.AddSyncfusionBlazor();
 
-// Enforce HTTPS by configuring Kestrel
-builder.WebHost.ConfigureKestrel(options =>
-{
-    options.ListenAnyIP(5001, listenOptions =>
-    {
-        listenOptions.UseHttps(); // Enforce HTTPS
-    });
-});
+ builder.Services.AddHttpClient("tribClient", config => {
+        config.BaseAddress = new Uri("https://localhost:5001/");
+        config.DefaultRequestHeaders.Accept.Clear();
+        config.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+ });
 
 var app = builder.Build();
 
@@ -52,7 +62,7 @@ app.MapRazorComponents<App>()
 
 
 // API Endpoints
-app.MapGet("/api/secure-data", () => "Protected data!");
+app.MapGet("/api/secure-data", (AzureAd azure) => azure.ClientId);
     // .RequireAuthorization("ApiAccess");
 
 
