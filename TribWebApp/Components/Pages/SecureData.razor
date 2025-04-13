@@ -1,4 +1,4 @@
-@inject HttpClient Http
+@inject IHttpClientFactory HttpClientFactory
 
 <h3>Secure Data</h3>
 
@@ -18,7 +18,8 @@ else
     {
         try
         {
-            secureData = await Http.GetStringAsync("https://localhost:5001/api/secure-data");
+            var httpClient = HttpClientFactory.CreateClient("tribClient");
+            secureData = await httpClient.GetStringAsync("/api/secure-data");
         }
         catch (Exception ex)
         {

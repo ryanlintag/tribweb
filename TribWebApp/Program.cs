@@ -33,6 +33,11 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 builder.Services.AddSyncfusionBlazor();
 
+ builder.Services.AddHttpClient("tribClient", config => {
+        config.BaseAddress = new Uri("https://localhost:5001/");
+        config.DefaultRequestHeaders.Accept.Clear();
+        config.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+ });
 
 var app = builder.Build();
 
