@@ -1,20 +1,10 @@
+using Application;
 using TribWebApp.Components;
 using Syncfusion.Blazor;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Retrieve configuration values and log them
-var clientSecret = builder.Configuration["AzureAd:AZURE_AD_CLIENT_SECRET"];
-var clientId = builder.Configuration["AzureAd:AZURE_AD_CLIENT_ID"];
-var tenantId = builder.Configuration["AzureAd:AZURE_AD_TENANT_ID"];
-
-var azureAd = new AzureAd();
-builder.Configuration.GetSection(AzureAd.SectionName).Bind(azureAd);
-azureAd.ClientId = clientId;
-azureAd.ClientSecret = clientSecret;
-azureAd.TenantId = tenantId;
-
-builder.Services.AddSingleton(azureAd);
+builder.Services.AddCustomServices();
 
 // // Add services
 // builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
@@ -27,6 +17,8 @@ builder.Services.AddSingleton(azureAd);
 //     options.AddPolicy("ApiAccess", policy =>
 //         policy.RequireClaim("scope", "access_as_user"));
 // });
+
+builder.Services.AddApplication();
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
@@ -62,7 +54,11 @@ app.MapRazorComponents<App>()
 
 
 // API Endpoints
-app.MapGet("/api/secure-data", (AzureAd azure) => azure.ClientId);
+app.MapGet("/api/secure-data", (IAzureConfigService azureService) => 
+{
+    var azure = azureService.GetConfig();
+    return azure.ClientId;
+});
     // .RequireAuthorization("ApiAccess");
 
 

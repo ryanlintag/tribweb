@@ -15,4 +15,11 @@
     <PackageReference Include="Microsoft.Identity.Web.UI" Version="2.16.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\src\core\Application\Application.csproj" />
+    <ProjectReference Include="..\src\core\Domain\Domain.csproj" />
+    <ProjectReference Include="..\src\cross_functional\Commons\Commons.csproj" />
+    <ProjectReference Include="..\src\external\Database\Database.csproj" />
+  </ItemGroup>
+
 </Project>

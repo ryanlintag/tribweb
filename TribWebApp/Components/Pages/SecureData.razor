@@ -1,5 +1,6 @@
+@using Application.Schools
 @inject IHttpClientFactory HttpClientFactory
-
+@inject ISender sender;
 <h3>Secure Data</h3>
 
 @if (secureData == null)
@@ -18,6 +19,9 @@ else
     {
         try
         {
+            var request = new GetDivisionsRequest();
+            var s = await sender.Send(request);
+
             var httpClient = HttpClientFactory.CreateClient("tribClient");
             secureData = await httpClient.GetStringAsync("/api/secure-data");
         }

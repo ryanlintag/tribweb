@@ -27,3 +27,30 @@ public sealed class AzureAd
         }
     }
 }
+public interface IConfigService<T>{
+    T GetConfig();
+}
+public interface IAzureConfigService : IConfigService<AzureAd> { }
+public sealed class AzureConfigService : IAzureConfigService
+{
+    private readonly IConfiguration _configuration;
+    public AzureConfigService(IConfiguration configuration)
+    {
+        _configuration = configuration;
+    }
+    public AzureAd GetConfig()
+    {        
+        // Retrieve configuration values and log them
+        var clientSecret = _configuration["AzureAd:AZURE_AD_CLIENT_SECRET"];
+        var clientId = _configuration["AzureAd:AZURE_AD_CLIENT_ID"];
+        var tenantId = _configuration["AzureAd:AZURE_AD_TENANT_ID"];
+
+        var azureAd = new AzureAd();
+        _configuration.GetSection(AzureAd.SectionName).Bind(azureAd);
+        azureAd.ClientId = clientId;
+        azureAd.ClientSecret = clientSecret;
+        azureAd.TenantId = tenantId;
+
+        return azureAd;
+    }
+}
