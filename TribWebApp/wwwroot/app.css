@@ -1,9 +1,18 @@
+/*Regal Pallete
+#11100F
+#5D1C34
+#A67D44
+#899481
+#CDBCAB
+#EFE8E1*/
+
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    background-color: #EBE6DE;
 }
 
 a, .btn-link {
-    color: #006bb7;
+    color: rgba(235, 230, 222, 0.9);
 }
 
 .btn-primary {
